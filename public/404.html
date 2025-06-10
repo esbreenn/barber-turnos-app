@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redireccionando...</title>
+  <script type="text/javascript">
+    // Script para manejar redirecciones en GitHub Pages para SPA de React Router
+    // Cuando GitHub Pages devuelve un 404, este archivo se carga y redirige a la base de la SPA.
+
+    // Obtiene la ruta completa solicitada por el navegador (ej. /barber-turnos-app/nuevo)
+    var fullPath = window.location.pathname;
+
+    // Define el nombre del repositorio, que es el subdirectorio en GitHub Pages
+    // ¡Asegúrate de que sea EXACTAMENTE el nombre de tu repositorio con las barras!
+    var repoName = "/barber-turnos-app/";
+
+    // Define la URL base de tu aplicación desplegada en GitHub Pages
+    // ¡Asegúrate de que sea EXACTAMENTE la URL de tu homepage en package.json!
+    var baseUrl = "https://esbreenn.github.io/barber-turnos-app/";
+
+    // Calcula la sub-ruta original que React Router debería manejar
+    // Por ejemplo, si fullPath es "/barber-turnos-app/nuevo", newPath será "/nuevo"
+    var newPath = fullPath.substring(fullPath.indexOf(repoName) + repoName.length);
+
+    // Redirige al navegador a la URL base de la aplicación con la ruta original
+    // pasada como un hash (#) en la URL. React Router puede leer este hash.
+    // Usamos window.location.replace para evitar que el 404 se quede en el historial.
+    window.location.replace(baseUrl + "#" + newPath);
+  </script>
+</head>
+<body>
+  Si no eres redirigido automáticamente, haz clic <a href="/">aquí</a>.
+</body>
+</html>
