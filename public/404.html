@@ -3,7 +3,17 @@
 <head>
   <meta charset="utf-8">
   <title>Redireccionando...</title>
-  <script src="/barber-turnos-app/redirect.js"></script> 
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-kMKNIxfHGxs66g6wWD4d9fhBvaF27AK9iPqPHkLU4F8='">
+  
+  <script>
+    // Este script ahora está directamente incrustado en el HTML.
+    // GitHub Pages lo servirá como parte del HTML.
+    var fullPath = window.location.pathname;
+    var repoName = "/barber-turnos-app/";
+    var baseUrl = "https://esbreenn.github.io/barber-turnos-app/";
+    var newPath = fullPath.substring(fullPath.indexOf(repoName) + repoName.length);
+    window.location.replace(baseUrl + "#" + newPath);
+  </script>
 </head>
 <body>
   Si no eres redirigido automáticamente, haz clic <a href="/">aquí</a>.
