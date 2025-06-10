@@ -4,14 +4,24 @@
   <meta charset="utf-8">
   <title>Redireccionando...</title>
   <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'sha256-VGOEHcndJTWG+WBB1dznay4hplyjYFAxRzYY0q+qEZo='">
-  
+
   <script>
     // Este script ahora está directamente incrustado en el HTML.
-    // GitHub Pages lo servirá como parte del HTML.
     var fullPath = window.location.pathname;
     var repoName = "/barber-turnos-app/";
     var baseUrl = "https://esbreenn.github.io/barber-turnos-app/";
+
+    // Calculamos newPath como lo hacíamos
     var newPath = fullPath.substring(fullPath.indexOf(repoName) + repoName.length);
+
+    // AÑADIMOS CONSOLE.LOGS PARA DEPURACIÓN
+    console.log("DEBUG: fullPath:", fullPath);
+    console.log("DEBUG: repoName:", repoName);
+    console.log("DEBUG: baseUrl:", baseUrl);
+    console.log("DEBUG: newPath (calculado):", newPath);
+    console.log("DEBUG: Redirigiendo a:", baseUrl + "#" + newPath);
+    // FIN DE LOGS
+
     window.location.replace(baseUrl + "#" + newPath);
   </script>
 </head>
