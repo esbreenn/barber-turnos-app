@@ -1,6 +1,7 @@
 // src/pages/EditTurno.jsx
 
 import React, { useState, useEffect } from 'react';
+// Asegúrate de importar collection, query, where, getDocs
 import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -19,13 +20,16 @@ function EditTurno() {
       try {
         const turnoDoc = await getDoc(doc(db, 'turnos', id));
         if (turnoDoc.exists()) {
-          setTurno({ id: turnoDoc.id, ...turnoDoc.data() });
+          const data = turnoDoc.data();
+          // Aseguramos que el precio se cargue como string para el input type="number"
+          setTurno({ id: turnoDoc.id, ...data, precio: data.precio !== undefined ? String(data.precio) : '' });
         } else {
           toast.error('El turno no existe.');
           navigate('/');
         }
       } catch (err) {
-        console.error("Error en fetchTurno de EditTurno:", err);
+        // Añadimos console.error para depuración
+        console.error("Error en fetchTurno de EditTurno:", err); 
         toast.error('Error al cargar el turno.');
         navigate('/');
       } finally {
@@ -49,6 +53,7 @@ function EditTurno() {
     setIsSaving(true);
     
     try {
+      // Lógica para verificar si el horario ya está ocupado por otro turno
       const q = query(
         collection(db, "turnos"),
         where("fecha", "==", turno.fecha),
@@ -59,7 +64,8 @@ function EditTurno() {
       let isOccupied = false;
       
       querySnapshot.forEach((doc) => {
-        if (doc.id !== id) {
+        // Importante: si el turno encontrado es el mismo que estamos editando, no lo consideramos "ocupado"
+        if (doc.id !== id) { 
           isOccupied = true;
         }
       });
@@ -70,13 +76,19 @@ function EditTurno() {
         return;
       }
 
-      const { id: turnoId, ...dataToUpdate } = turno;
+      // Convertimos el precio a número antes de actualizarlo en Firebase
+      const precioNumerico = turno.precio ? parseFloat(turno.precio) : 0;
+
+      const { id: turnoId, ...dataToUpdate } = turno; // Extraemos el ID
       const turnoDocRef = doc(db, 'turnos', turnoId);
-      await updateDoc(turnoDocRef, dataToUpdate);
+      // Actualizamos el documento con los nuevos datos y el precio convertido a número
+      await updateDoc(turnoDocRef, { ...dataToUpdate, precio: precioNumerico });
+      
       toast.success('Turno actualizado con éxito');
       navigate('/');
 
     } catch (err) {
+      // Añadimos console.error para depuración
       console.error("Error en handleSubmit de EditTurno:", err);
       toast.error('Error al actualizar el turno.');
     } finally {
@@ -85,18 +97,25 @@ function EditTurno() {
   };
   
   if (loading) return <div className="text-center mt-5"><div className="spinner-border"></div></div>;
+  // Añadimos un mensaje si el turno no se encontró (después de cargar)
   if (!turno) return <div className="alert alert-danger text-center">No se encontró el turno.</div>;
 
   return (
+    // Contenedor para centrar la tarjeta
     <div className="container mt-4" style={{ maxWidth: '600px' }}>
-      <h2 className="mb-4">Editar Turno</h2>
-      <TurnoForm
-        turnoData={turno}
-        onFormChange={handleChange}
-        onSubmit={handleSubmit}
-        isSaving={isSaving}
-        submitText="Actualizar Turno"
-      />
+      {/* La tarjeta que envuelve el formulario */}
+      <div className="card bg-dark text-white p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
+        <h2 className="mb-4 text-center">Editar Turno</h2>
+        {turno && ( // Renderizamos el formulario solo si 'turno' no es null
+          <TurnoForm
+            turnoData={turno}
+            onFormChange={handleChange}
+            onSubmit={handleSubmit}
+            isSaving={isSaving}
+            submitText="Actualizar Turno"
+          />
+        )}
+      </div>
     </div>
   );
 }

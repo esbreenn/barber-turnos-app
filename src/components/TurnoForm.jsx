@@ -3,7 +3,8 @@
 import React from 'react';
 
 function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText }) {
-  const { nombre, fecha, hora, servicio } = turnoData;
+  // Asegúrate de incluir 'precio' en la desestructuración AQUI
+  const { nombre, fecha, hora, servicio, precio } = turnoData; 
 
   return (
     <form onSubmit={onSubmit}>
@@ -41,6 +42,19 @@ function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText }) 
           value={hora}
           onChange={onFormChange}
           required
+        />
+      </div>
+      <div className="mb-3"> {/* ¡ESTE ES EL NUEVO CAMPO: PRECIO! */}
+        <label htmlFor="precio" className="form-label">Precio del Servicio ($)</label>
+        <input
+          type="number" // Usamos type="number" para precios
+          className="form-control"
+          id="precio"
+          name="precio"
+          value={precio || ''} // Si no hay precio, muestra vacío
+          onChange={onFormChange}
+          min="0" // Evita precios negativos
+          step="0.01" // Permite céntimos si es necesario (o "1" si solo son enteros)
         />
       </div>
       <div className="mb-4">

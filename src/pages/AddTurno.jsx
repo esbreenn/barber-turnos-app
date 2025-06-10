@@ -7,7 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import TurnoForm from '../components/TurnoForm';
 import toast from 'react-hot-toast';
 
-const initialState = { nombre: '', fecha: '', hora: '', servicio: '' };
+// ¡AQUI es donde establecemos el precio base de 9000!
+const initialState = { nombre: '', fecha: '', hora: '', servicio: '', precio: '9000' };
 
 function AddTurno() {
   const [turno, setTurno] = useState(initialState);
@@ -21,6 +22,9 @@ function AddTurno() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Aseguramos que el precio sea un número antes de guardar, si se ingresó.
+    const precioNumerico = turno.precio ? parseFloat(turno.precio) : 0; // Convertimos a número, 0 si está vacío o no es válido
+
     if (!turno.nombre.trim() || !turno.fecha || !turno.hora) {
       toast.error('Nombre, fecha y hora son campos obligatorios.');
       return;
@@ -42,12 +46,12 @@ function AddTurno() {
         return;
       }
 
-      await addDoc(collection(db, "turnos"), { ...turno, creado: Timestamp.now() });
+      // Guardamos el turno con el precio (convertido a número)
+      await addDoc(collection(db, "turnos"), { ...turno, precio: precioNumerico, creado: Timestamp.now() });
       toast.success('Turno guardado con éxito');
       navigate('/');
 
     } catch (err) {
-      // Usamos la variable 'err' para depuración y eliminamos el warning
       console.error("Error en handleSubmit de AddTurno:", err); 
       toast.error('Hubo un error al validar o guardar el turno.');
     } finally {
