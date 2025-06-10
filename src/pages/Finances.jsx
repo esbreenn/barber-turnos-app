@@ -35,21 +35,21 @@ function Finances() {
         return () => unsubscribe(); // Limpieza al desmontar el componente
     }, []);
 
-    // Cálculo de las ganancias para el mes y año seleccionados
-    const monthlyEarnings = useMemo(() => {
+    // Cálculo de las ganancias y filtrado de turnos para el mes y año seleccionados
+    const { monthlyEarnings, turnosDelMesFiltrados } = useMemo(() => {
         let total = 0;
-        const turnosDelMes = allTurnos.filter(turno => {
+        const turnosFiltrados = allTurnos.filter(turno => {
             // Asumimos que turno.fecha está en formato 'YYYY-MM-DD'
             const [year, month] = turno.fecha.split('-').map(Number);
             return year === selectedYear && month === selectedMonth;
         });
 
-        turnosDelMes.forEach(turno => {
+        turnosFiltrados.forEach(turno => {
             // Aseguramos que el precio es un número antes de sumarlo
             total += parseFloat(turno.precio || 0);
         });
 
-        return total;
+        return { monthlyEarnings: total, turnosDelMesFiltrados: turnosFiltrados };
     }, [allTurnos, selectedMonth, selectedYear]);
 
     // Opciones de años para el selector
@@ -75,11 +75,11 @@ function Finances() {
     if (error) return <div className="alert alert-danger text-center mt-5">{error}</div>;
 
     return (
-        <div className="container mt-4" style={{ maxWidth: '700px' }}>
+        <div className="container mt-4" style={{ maxWidth: '800px' }}> {/* Aumentamos el maxWidth un poco */}
             <h2 className="mb-4 text-white text-center">Resumen de Finanzas</h2>
 
             <div className="card bg-dark text-white p-4 shadow-sm mb-4">
-                <div className="d-flex justify-content-center align-items-center mb-3">
+                <div className="d-flex flex-wrap justify-content-center align-items-center mb-3">
                     <label htmlFor="month-select" className="form-label me-2 mb-0">Mes:</label>
                     <select
                         id="month-select"
@@ -112,10 +112,40 @@ function Finances() {
                 <p className="text-center text-white-50">
                     Calculado a partir de los turnos con precio en el mes seleccionado.
                 </p>
-            </div>
+                
+                {/* ¡ESTA ES LA TABLA DETALLE DE TURNOS QUE NECESITAS! */}
+                {turnosDelMesFiltrados.length > 0 && (
+                    <div className="mt-4 table-responsive">
+                        <h4 className="text-white-50 mb-3">Detalle de Turnos del Mes:</h4>
+                        <table className="table table-dark table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                    <th>Nombre</th>
+                                    <th>Servicio</th>
+                                    <th>Precio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {turnosDelMesFiltrados.map(turno => (
+                                    <tr key={turno.id}>
+                                        <td>{turno.fecha}</td>
+                                        <td>{turno.hora}</td>
+                                        <td>{turno.nombre}</td>
+                                        <td>{turno.servicio || 'N/A'}</td>
+                                        <td>${parseFloat(turno.precio || 0).toFixed(2)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                 {turnosDelMesFiltrados.length === 0 && (
+                    <p className="text-white-50 text-center mt-3">No hay turnos con precio para este mes.</p>
+                )}
 
-            {/* Opcional: Aquí podrías mostrar una tabla de los turnos de ese mes con sus precios individuales */}
-            {/* Si te interesa, podemos añadir la visualización de los turnos que componen el total. */}
+            </div>
         </div>
     );
 }

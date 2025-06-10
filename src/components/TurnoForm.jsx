@@ -2,9 +2,18 @@
 
 import React from 'react';
 
+// Definimos los servicios y sus precios aqui para que TurnoForm los conozca.
+// Los usaremos en el selector.
+const SERVICES_OPTIONS = [
+  { value: '', label: 'Seleccione un servicio', price: 0 }, // Opción por defecto
+  { value: 'Corte de Cabello', label: 'Corte de Cabello', price: 8000 },
+  { value: 'Corte y Barba', label: 'Corte y Barba', price: 10000 },
+];
+
 function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText }) {
-  // Asegúrate de incluir 'precio' en la desestructuración AQUI
-  const { nombre, fecha, hora, servicio, precio } = turnoData; 
+  // Ya no desestructuramos 'precio' directamente, ya que no es un input directo aquí.
+  // Pero 'servicio' sí lo es.
+  const { nombre, fecha, hora, servicio } = turnoData; 
 
   return (
     <form onSubmit={onSubmit}>
@@ -44,30 +53,25 @@ function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText }) 
           required
         />
       </div>
-      <div className="mb-3"> {/* ¡ESTE ES EL NUEVO CAMPO: PRECIO! */}
-        <label htmlFor="precio" className="form-label">Precio del Servicio ($)</label>
-        <input
-          type="number" // Usamos type="number" para precios
-          className="form-control"
-          id="precio"
-          name="precio"
-          value={precio || ''} // Si no hay precio, muestra vacío
-          onChange={onFormChange}
-          min="0" // Evita precios negativos
-          step="0.01" // Permite céntimos si es necesario (o "1" si solo son enteros)
-        />
-      </div>
-      <div className="mb-4">
+      
+      <div className="mb-4"> {/* CAMPO SERVICIO AHORA ES UN SELECT */}
         <label htmlFor="servicio" className="form-label">Servicio</label>
-        <input
-          type="text"
-          className="form-control"
+        <select
+          className="form-select" // Clase de Bootstrap para select
           id="servicio"
           name="servicio"
-          value={servicio || ''}
+          value={servicio}
           onChange={onFormChange}
-        />
+          required // Hacemos que la selección del servicio sea obligatoria
+        >
+          {SERVICES_OPTIONS.map(option => (
+            <option key={option.value} value={option.value} disabled={option.value === ''}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </div>
+
       <button type="submit" className="btn btn-primary w-100" disabled={isSaving}>
         {isSaving ? 'Guardando...' : submitText}
       </button>

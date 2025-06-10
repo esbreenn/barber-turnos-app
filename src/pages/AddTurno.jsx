@@ -7,8 +7,21 @@ import { useNavigate } from 'react-router-dom';
 import TurnoForm from '../components/TurnoForm';
 import toast from 'react-hot-toast';
 
-// ¡AQUI es donde establecemos el precio base de 9000!
-const initialState = { nombre: '', fecha: '', hora: '', servicio: '', precio: '9000' };
+// Definimos los servicios y sus precios aquí, para que AddTurno los use.
+const SERVICES_PRICES = {
+  'Corte de Cabello': 8000,
+  'Corte y Barba': 10000,
+  '': 0, // Para la opción "Seleccione un servicio"
+};
+
+// Estado inicial: Ahora incluimos el servicio por defecto y el precio correspondiente
+const initialState = { 
+  nombre: '', 
+  fecha: '', 
+  hora: '', 
+  servicio: '', // Servicio inicial vacío para obligar a la selección
+  precio: 0 // Precio inicial 0, se actualizará al seleccionar un servicio
+};
 
 function AddTurno() {
   const [turno, setTurno] = useState(initialState);
@@ -17,16 +30,26 @@ function AddTurno() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setTurno(prevTurno => ({ ...prevTurno, [name]: value }));
+
+    if (name === 'servicio') {
+      // Si el campo que cambia es el servicio, actualizamos el precio automáticamente
+      const selectedPrice = SERVICES_PRICES[value] || 0; // Asignamos el precio del servicio seleccionado
+      setTurno(prevTurno => ({ 
+        ...prevTurno, 
+        servicio: value, // Actualizamos el servicio
+        precio: selectedPrice // Actualizamos el precio
+      }));
+    } else {
+      // Para otros campos, solo actualizamos el valor
+      setTurno(prevTurno => ({ ...prevTurno, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aseguramos que el precio sea un número antes de guardar, si se ingresó.
-    const precioNumerico = turno.precio ? parseFloat(turno.precio) : 0; // Convertimos a número, 0 si está vacío o no es válido
-
-    if (!turno.nombre.trim() || !turno.fecha || !turno.hora) {
-      toast.error('Nombre, fecha y hora son campos obligatorios.');
+    // Ahora, el servicio también es un campo obligatorio
+    if (!turno.nombre.trim() || !turno.fecha || !turno.hora || !turno.servicio) {
+      toast.error('Nombre, fecha, hora y servicio son campos obligatorios.');
       return;
     }
     setLoading(true);
@@ -46,7 +69,11 @@ function AddTurno() {
         return;
       }
 
-      // Guardamos el turno con el precio (convertido a número)
+      // El precio ya está actualizado en el estado por handleChange.
+      // Aseguramos que se guarde como número.
+      const precioNumerico = parseFloat(turno.precio); 
+
+      // Guardamos el turno con el precio (ya calculado)
       await addDoc(collection(db, "turnos"), { ...turno, precio: precioNumerico, creado: Timestamp.now() });
       toast.success('Turno guardado con éxito');
       navigate('/');
