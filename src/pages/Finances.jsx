@@ -10,13 +10,11 @@ function Finances() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Estado para el mes y año seleccionados (por defecto, el mes y año actuales)
     const today = new Date();
-    const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1); // getMonth() es 0-11
+    const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(today.getFullYear());
 
     useEffect(() => {
-        // Obtenemos todos los turnos, ordenados por fecha, para poder filtrarlos en el cliente
         const q = query(collection(db, "turnos"), orderBy("fecha", "asc"));
 
         const unsubscribe = onSnapshot(q,
@@ -32,30 +30,39 @@ function Finances() {
             }
         );
 
-        return () => unsubscribe(); // Limpieza al desmontar el componente
+        return () => unsubscribe();
     }, []);
 
     // Cálculo de las ganancias y filtrado de turnos para el mes y año seleccionados
-    const { monthlyEarnings, turnosDelMesFiltrados } = useMemo(() => {
+    // ¡Aquí añadimos el contador de cortes!
+    const { monthlyEarnings, totalCortes, turnosDelMesFiltrados } = useMemo(() => {
         let total = 0;
+        let cortesCount = 0; // NUEVO: Contador de cortes
+
         const turnosFiltrados = allTurnos.filter(turno => {
-            // Asumimos que turno.fecha está en formato 'YYYY-MM-DD'
             const [year, month] = turno.fecha.split('-').map(Number);
             return year === selectedYear && month === selectedMonth;
         });
 
         turnosFiltrados.forEach(turno => {
-            // Aseguramos que el precio es un número antes de sumarlo
             total += parseFloat(turno.precio || 0);
+
+            // NUEVO: Contamos solo si el servicio es un tipo de corte
+            if (turno.servicio === 'Corte de Cabello' || turno.servicio === 'Corte y Barba') {
+                cortesCount++;
+            }
         });
 
-        return { monthlyEarnings: total, turnosDelMesFiltrados: turnosFiltrados };
+        return { 
+            monthlyEarnings: total, 
+            totalCortes: cortesCount, // Retornamos el nuevo contador
+            turnosDelMesFiltrados: turnosFiltrados 
+        };
     }, [allTurnos, selectedMonth, selectedYear]);
 
     // Opciones de años para el selector
     const years = useMemo(() => {
         const currentYear = new Date().getFullYear();
-        // Generamos un rango de años, por ejemplo, 5 años antes y 1 año después del actual
         const yearsArray = [];
         for (let i = currentYear - 5; i <= currentYear + 1; i++) {
             yearsArray.push(i);
@@ -75,7 +82,7 @@ function Finances() {
     if (error) return <div className="alert alert-danger text-center mt-5">{error}</div>;
 
     return (
-        <div className="container mt-4" style={{ maxWidth: '800px' }}> {/* Aumentamos el maxWidth un poco */}
+        <div className="container mt-4" style={{ maxWidth: '800px' }}>
             <h2 className="mb-4 text-white text-center">Resumen de Finanzas</h2>
 
             <div className="card bg-dark text-white p-4 shadow-sm mb-4">
@@ -109,11 +116,16 @@ function Finances() {
                     Ganancias Totales del Mes: <span className="text-primary fs-4">${monthlyEarnings.toFixed(2)}</span>
                 </h3>
 
+                {/* NUEVO: Contador de Cortes */}
+                <h4 className="text-center mb-3">
+                    Cortes Realizados: <span className="text-info fs-5">{totalCortes}</span>
+                </h4>
+                {/* FIN NUEVO */}
+
                 <p className="text-center text-white-50">
                     Calculado a partir de los turnos con precio en el mes seleccionado.
                 </p>
                 
-                {/* ¡ESTA ES LA TABLA DETALLE DE TURNOS QUE NECESITAS! */}
                 {turnosDelMesFiltrados.length > 0 && (
                     <div className="mt-4 table-responsive">
                         <h4 className="text-white-50 mb-3">Detalle de Turnos del Mes:</h4>
