@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase/config';
-import toast from 'react-hot-toast';
 
 function Finances() {
     const [allTurnos, setAllTurnos] = useState([]);

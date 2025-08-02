@@ -58,11 +58,14 @@ function EditTurno() {
     if (name === 'servicio') {
       // Si el campo que cambia es el servicio, actualizamos el precio automáticamente
       const selectedPrice = SERVICES_PRICES[value] || 0; // Asignamos el precio del servicio seleccionado
-      setTurno(prevTurno => ({ 
-        ...prevTurno, 
+      setTurno(prevTurno => ({
+        ...prevTurno,
         servicio: value, // Actualizamos el servicio
         precio: selectedPrice // Actualizamos el precio
       }));
+    } else if (name === 'precio') {
+      // Permitimos cambiar manualmente el precio desde el input
+      setTurno(prevTurno => ({ ...prevTurno, precio: value }));
     } else {
       // Para otros campos, solo actualizamos el valor
       setTurno(prevTurno => ({ ...prevTurno, [name]: value }));

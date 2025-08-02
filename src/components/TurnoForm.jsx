@@ -11,9 +11,8 @@ const SERVICES_OPTIONS = [
 ];
 
 function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText }) {
-  // Ya no desestructuramos 'precio' directamente, ya que no es un input directo aquí.
-  // Pero 'servicio' sí lo es.
-  const { nombre, fecha, hora, servicio } = turnoData; 
+  // Desestructuramos todos los campos, incluido "precio" para el input numérico.
+  const { nombre, fecha, hora, servicio, precio } = turnoData;
 
   return (
     <form onSubmit={onSubmit}>
@@ -70,6 +69,19 @@ function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText }) 
             </option>
           ))}
         </select>
+      </div>
+
+      <div className="mb-3">
+        <label htmlFor="precio" className="form-label">Precio</label>
+        <input
+          type="number"
+          className="form-control"
+          id="precio"
+          name="precio"
+          value={precio}
+          onChange={onFormChange}
+          required
+        />
       </div>
 
       <button type="submit" className="btn btn-primary w-100" disabled={isSaving}>
