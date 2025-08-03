@@ -21,7 +21,7 @@ function AddTurno() {
   const [turno, setTurno] = useState(initialState);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { services, servicePrices, reload } = useServices();
+  const { services, servicePrices } = useServices();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -94,7 +94,6 @@ function AddTurno() {
         isSaving={loading}
         submitText="Guardar Turno"
         services={services}
-        reload={reload}
       />
     </div>
   );

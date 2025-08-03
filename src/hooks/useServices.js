@@ -1,31 +1,24 @@
-import { useState, useEffect, useCallback } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { useMemo } from 'react';
 
+// Hook simplificado: devuelve dos servicios fijos con precios predeterminados.
 function useServices() {
-  const [services, setServices] = useState([]);
-  const [servicePrices, setServicePrices] = useState({});
+  const services = useMemo(
+    () => [
+      { id: 'corte', nombre: 'Corte de pelo' },
+      { id: 'corte-barba', nombre: 'Corte de pelo y barba' },
+    ],
+    []
+  );
 
-  const load = useCallback(async () => {
-    try {
-      const snapshot = await getDocs(collection(db, 'services'));
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setServices(data);
-      const prices = {};
-      data.forEach((s) => {
-        prices[s.nombre] = s.precio;
-      });
-      setServicePrices(prices);
-    } catch (err) {
-      console.error('Error fetching services:', err);
-    }
-  }, []);
+  const servicePrices = useMemo(
+    () => ({
+      'Corte de pelo': 9000,
+      'Corte de pelo y barba': 12000,
+    }),
+    []
+  );
 
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  return { services, servicePrices, reload: load };
+  return { services, servicePrices };
 }
 
 export default useServices;
