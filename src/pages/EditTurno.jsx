@@ -14,7 +14,7 @@ function EditTurno() {
   const [turno, setTurno] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const { services, servicePrices, reload } = useServices();
+  const { services, servicePrices } = useServices();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -129,7 +129,6 @@ function EditTurno() {
             isSaving={isSaving}
             submitText="Actualizar Turno"
             services={services}
-            reload={reload}
           />
         )}
       </div>
