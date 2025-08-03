@@ -7,49 +7,49 @@ import { useParams, useNavigate } from 'react-router-dom';
 import TurnoForm from '../components/TurnoForm';
 import toast from 'react-hot-toast';
 
-// Definimos los servicios y sus precios aqui, igual que en AddTurno.
-const SERVICES_PRICES = {
-  'Corte de Cabello': 8000,
-  'Corte y Barba': 10000,
-  '': 0, // Para la opción "Seleccione un servicio"
-};
-
 function EditTurno() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [turno, setTurno] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [services, setServices] = useState([]);
+  const [servicePrices, setServicePrices] = useState({});
 
   useEffect(() => {
-    const fetchTurno = async () => {
+    const fetchData = async () => {
       try {
+        const servicesSnap = await getDocs(collection(db, 'services'));
+        const servicesData = servicesSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setServices(servicesData);
+        const prices = {};
+        servicesData.forEach((s) => {
+          prices[s.nombre] = s.precio;
+        });
+        setServicePrices(prices);
+
         const turnoDoc = await getDoc(doc(db, 'turnos', id));
         if (turnoDoc.exists()) {
           const data = turnoDoc.data();
-          // Aseguramos que el servicio tenga un valor por defecto si no lo tenía antes
-          // Y que el precio se asigne si el servicio ya existe o está vacío.
-          // El precio cargado de la DB se usa si existe, de lo contrario, se recalcula si el servicio se modifica.
-          setTurno({ 
-            id: turnoDoc.id, 
-            ...data, 
-            servicio: data.servicio || '', // Asegura que el servicio no sea undefined para el selector
-            // El precio se mantiene como viene de la DB para edición
-            precio: data.precio !== undefined ? String(data.precio) : '0' 
+          setTurno({
+            id: turnoDoc.id,
+            ...data,
+            servicio: data.servicio || '',
+            precio: data.precio !== undefined ? String(data.precio) : '0',
           });
         } else {
           toast.error('El turno no existe.');
           navigate('/');
         }
       } catch (err) {
-        console.error("Error en fetchTurno de EditTurno:", err); 
+        console.error('Error en fetchTurno de EditTurno:', err);
         toast.error('Error al cargar el turno.');
         navigate('/');
       } finally {
         setLoading(false);
       }
     };
-    fetchTurno();
+    fetchData();
   }, [id, navigate]);
 
   const handleChange = (e) => {
@@ -57,11 +57,11 @@ function EditTurno() {
 
     if (name === 'servicio') {
       // Si el campo que cambia es el servicio, actualizamos el precio automáticamente
-      const selectedPrice = SERVICES_PRICES[value] || 0; // Asignamos el precio del servicio seleccionado
-      setTurno(prevTurno => ({
+      const selectedPrice = servicePrices[value] || 0; // Asignamos el precio del servicio seleccionado
+      setTurno((prevTurno) => ({
         ...prevTurno,
-        servicio: value, // Actualizamos el servicio
-        precio: selectedPrice // Actualizamos el precio
+        servicio: value,
+        precio: selectedPrice,
       }));
     } else if (name === 'precio') {
       // Permitimos cambiar manualmente el precio desde el input
@@ -137,6 +137,7 @@ function EditTurno() {
             onSubmit={handleSubmit}
             isSaving={isSaving}
             submitText="Actualizar Turno"
+            services={services}
           />
         )}
       </div>
