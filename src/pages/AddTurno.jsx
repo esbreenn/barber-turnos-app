@@ -1,11 +1,12 @@
 // src/pages/AddTurno.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { collection, addDoc, Timestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useNavigate } from 'react-router-dom';
 import TurnoForm from '../components/TurnoForm';
 import toast from 'react-hot-toast';
+import useServices from '../hooks/useServices';
 
 // Estado inicial: Ahora incluimos el servicio por defecto y el precio correspondiente
 const initialState = {
@@ -18,29 +19,9 @@ const initialState = {
 
 function AddTurno() {
   const [turno, setTurno] = useState(initialState);
-  const [services, setServices] = useState([]);
-  const [servicePrices, setServicePrices] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const fetchServices = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, 'services'));
-      const servicesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setServices(servicesData);
-      const prices = {};
-      servicesData.forEach((s) => {
-        prices[s.nombre] = s.precio;
-      });
-      setServicePrices(prices);
-    } catch (err) {
-      console.error('Error fetching services:', err);
-    }
-  };
-
-  useEffect(() => {
-    fetchServices();
-  }, []);
+  const { services, servicePrices, reload } = useServices();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -113,7 +94,7 @@ function AddTurno() {
         isSaving={loading}
         submitText="Guardar Turno"
         services={services}
-        reloadServices={fetchServices}
+        reload={reload}
       />
     </div>
   );

@@ -5,7 +5,7 @@ import { collection, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import toast from 'react-hot-toast';
 
-function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText, services = [], reloadServices }) {
+function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText, services = [], reload }) {
   // Desestructuramos todos los campos, incluido "precio" para el input numérico.
   const { nombre, fecha, hora, servicio, precio } = turnoData;
 
@@ -44,8 +44,8 @@ function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText, se
         precio: Number(newService.precio),
       });
       toast.success('Servicio agregado');
-      if (reloadServices) {
-        await reloadServices();
+      if (reload) {
+        await reload();
       }
       onFormChange({ target: { name: 'servicio', value: newService.nombre } });
       onFormChange({ target: { name: 'precio', value: newService.precio } });
