@@ -6,6 +6,7 @@ import { db } from '../firebase/config';
 import { useParams, useNavigate } from 'react-router-dom';
 import TurnoForm from '../components/TurnoForm';
 import toast from 'react-hot-toast';
+import useServices from '../hooks/useServices';
 
 function EditTurno() {
   const { id } = useParams();
@@ -13,28 +14,11 @@ function EditTurno() {
   const [turno, setTurno] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [services, setServices] = useState([]);
-  const [servicePrices, setServicePrices] = useState({});
-  const fetchServices = async () => {
-    try {
-      const servicesSnap = await getDocs(collection(db, 'services'));
-      const servicesData = servicesSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setServices(servicesData);
-      const prices = {};
-      servicesData.forEach((s) => {
-        prices[s.nombre] = s.precio;
-      });
-      setServicePrices(prices);
-    } catch (err) {
-      console.error('Error fetching services:', err);
-    }
-  };
+  const { services, servicePrices, reload } = useServices();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await fetchServices();
-
         const turnoDoc = await getDoc(doc(db, 'turnos', id));
         if (turnoDoc.exists()) {
           const data = turnoDoc.data();
@@ -145,7 +129,7 @@ function EditTurno() {
             isSaving={isSaving}
             submitText="Actualizar Turno"
             services={services}
-            reloadServices={fetchServices}
+            reload={reload}
           />
         )}
       </div>
