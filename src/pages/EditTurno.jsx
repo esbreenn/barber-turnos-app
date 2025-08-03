@@ -15,18 +15,25 @@ function EditTurno() {
   const [isSaving, setIsSaving] = useState(false);
   const [services, setServices] = useState([]);
   const [servicePrices, setServicePrices] = useState({});
+  const fetchServices = async () => {
+    try {
+      const servicesSnap = await getDocs(collection(db, 'services'));
+      const servicesData = servicesSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setServices(servicesData);
+      const prices = {};
+      servicesData.forEach((s) => {
+        prices[s.nombre] = s.precio;
+      });
+      setServicePrices(prices);
+    } catch (err) {
+      console.error('Error fetching services:', err);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const servicesSnap = await getDocs(collection(db, 'services'));
-        const servicesData = servicesSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setServices(servicesData);
-        const prices = {};
-        servicesData.forEach((s) => {
-          prices[s.nombre] = s.precio;
-        });
-        setServicePrices(prices);
+        await fetchServices();
 
         const turnoDoc = await getDoc(doc(db, 'turnos', id));
         if (turnoDoc.exists()) {
@@ -138,6 +145,7 @@ function EditTurno() {
             isSaving={isSaving}
             submitText="Actualizar Turno"
             services={services}
+            reloadServices={fetchServices}
           />
         )}
       </div>

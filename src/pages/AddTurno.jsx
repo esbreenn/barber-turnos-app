@@ -23,21 +23,22 @@ function AddTurno() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const fetchServices = async () => {
+    try {
+      const snapshot = await getDocs(collection(db, 'services'));
+      const servicesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setServices(servicesData);
+      const prices = {};
+      servicesData.forEach((s) => {
+        prices[s.nombre] = s.precio;
+      });
+      setServicePrices(prices);
+    } catch (err) {
+      console.error('Error fetching services:', err);
+    }
+  };
+
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        const snapshot = await getDocs(collection(db, 'services'));
-        const servicesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setServices(servicesData);
-        const prices = {};
-        servicesData.forEach((s) => {
-          prices[s.nombre] = s.precio;
-        });
-        setServicePrices(prices);
-      } catch (err) {
-        console.error('Error fetching services:', err);
-      }
-    };
     fetchServices();
   }, []);
 
@@ -112,6 +113,7 @@ function AddTurno() {
         isSaving={loading}
         submitText="Guardar Turno"
         services={services}
+        reloadServices={fetchServices}
       />
     </div>
   );
