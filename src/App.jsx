@@ -7,6 +7,7 @@ import AddTurno from "./pages/AddTurno";
 import EditTurno from "./pages/EditTurno";
 import Login from "./pages/Login";
 import Finances from "./pages/Finances";
+import ManageServices from "./pages/ManageServices";
 
 import Navbar from "./components/Navbar";
 
@@ -49,6 +50,7 @@ function App() {
           <Route path="/edit-turno/:id" element={<PrivateRoute user={currentUser}><EditTurno /></PrivateRoute>} />
 
           <Route path="/finanzas" element={<PrivateRoute user={currentUser}><Finances /></PrivateRoute>} />
+          <Route path="/services" element={<PrivateRoute user={currentUser}><ManageServices /></PrivateRoute>} />
 
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

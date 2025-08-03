@@ -1,39 +1,52 @@
 // src/pages/AddTurno.jsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { collection, addDoc, Timestamp, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase/config';
 import { useNavigate } from 'react-router-dom';
 import TurnoForm from '../components/TurnoForm';
 import toast from 'react-hot-toast';
 
-// Definimos los servicios y sus precios aquí, para que AddTurno los use.
-const SERVICES_PRICES = {
-  'Corte de Cabello': 8000,
-  'Corte y Barba': 10000,
-  '': 0, // Para la opción "Seleccione un servicio"
-};
-
 // Estado inicial: Ahora incluimos el servicio por defecto y el precio correspondiente
-const initialState = { 
-  nombre: '', 
-  fecha: '', 
-  hora: '', 
+const initialState = {
+  nombre: '',
+  fecha: '',
+  hora: '',
   servicio: '', // Servicio inicial vacío para obligar a la selección
   precio: 0 // Precio inicial 0, se actualizará al seleccionar un servicio
 };
 
 function AddTurno() {
   const [turno, setTurno] = useState(initialState);
+  const [services, setServices] = useState([]);
+  const [servicePrices, setServicePrices] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'services'));
+        const servicesData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setServices(servicesData);
+        const prices = {};
+        servicesData.forEach((s) => {
+          prices[s.nombre] = s.precio;
+        });
+        setServicePrices(prices);
+      } catch (err) {
+        console.error('Error fetching services:', err);
+      }
+    };
+    fetchServices();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
     if (name === 'servicio') {
       // Si el campo que cambia es el servicio, actualizamos el precio automáticamente
-      const selectedPrice = SERVICES_PRICES[value] || 0; // Asignamos el precio del servicio seleccionado
+      const selectedPrice = servicePrices[value] || 0; // Asignamos el precio del servicio seleccionado
       setTurno(prevTurno => ({
         ...prevTurno,
         servicio: value, // Actualizamos el servicio
@@ -98,6 +111,7 @@ function AddTurno() {
         onSubmit={handleSubmit}
         isSaving={loading}
         submitText="Guardar Turno"
+        services={services}
       />
     </div>
   );

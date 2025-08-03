@@ -2,15 +2,7 @@
 
 import React from 'react';
 
-// Definimos los servicios y sus precios aqui para que TurnoForm los conozca.
-// Los usaremos en el selector.
-const SERVICES_OPTIONS = [
-  { value: '', label: 'Seleccione un servicio', price: 0 }, // Opción por defecto
-  { value: 'Corte de Cabello', label: 'Corte de Cabello', price: 8000 },
-  { value: 'Corte y Barba', label: 'Corte y Barba', price: 10000 },
-];
-
-function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText }) {
+function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText, services = [] }) {
   // Desestructuramos todos los campos, incluido "precio" para el input numérico.
   const { nombre, fecha, hora, servicio, precio } = turnoData;
 
@@ -56,16 +48,17 @@ function TurnoForm({ turnoData, onFormChange, onSubmit, isSaving, submitText }) 
       <div className="mb-4"> {/* CAMPO SERVICIO AHORA ES UN SELECT */}
         <label htmlFor="servicio" className="form-label">Servicio</label>
         <select
-          className="form-select" // Clase de Bootstrap para select
+          className="form-select"
           id="servicio"
           name="servicio"
           value={servicio}
           onChange={onFormChange}
-          required // Hacemos que la selección del servicio sea obligatoria
+          required
         >
-          {SERVICES_OPTIONS.map(option => (
-            <option key={option.value} value={option.value} disabled={option.value === ''}>
-              {option.label}
+          <option value="" disabled>Seleccione un servicio</option>
+          {services.map((s) => (
+            <option key={s.id} value={s.nombre}>
+              {s.nombre}
             </option>
           ))}
         </select>
