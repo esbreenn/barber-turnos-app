@@ -1,8 +1,19 @@
 // src/pages/Finances.jsx
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase/config';
+
+function parseYearMonth(fecha) {
+    if (typeof fecha === 'string') {
+        return fecha.split('-').map(Number);
+    }
+    if (fecha instanceof Timestamp) {
+        const date = fecha.toDate();
+        return [date.getFullYear(), date.getMonth() + 1];
+    }
+    return [NaN, NaN];
+}
 
 function Finances() {
     const [allTurnos, setAllTurnos] = useState([]);
@@ -80,7 +91,7 @@ function Finances() {
         let cortesCount = 0; // NUEVO: Contador de cortes
 
         const turnosFiltrados = allTurnos.filter((turno) => {
-            const [year, month] = turno.fecha.split('-').map(Number);
+            const [year, month] = parseYearMonth(turno.fecha);
             return year === selectedYear && month === selectedMonth;
         });
 
@@ -111,7 +122,7 @@ function Finances() {
         let costos = 0;
 
         const ventasFiltradas = allProductSales.filter((venta) => {
-            const [year, month] = venta.fecha.split('-').map(Number);
+            const [year, month] = parseYearMonth(venta.fecha);
             const matchesDate = year === selectedYear && month === selectedMonth;
             const matchesCategory = selectedCategory ? venta.categoria === selectedCategory : true;
             return matchesDate && matchesCategory;
@@ -239,7 +250,7 @@ function Finances() {
                             <tbody>
                                 {turnosDelMesFiltrados.map((turno) => (
                                     <tr key={turno.id}>
-                                        <td>{turno.fecha}</td>
+                                        <td>{turno.fecha instanceof Timestamp ? turno.fecha.toDate().toISOString().split('T')[0] : turno.fecha}</td>
                                         <td>{turno.hora}</td>
                                         <td>{turno.nombre}</td>
                                         <td>{turno.servicio || 'N/A'}</td>
@@ -271,7 +282,7 @@ function Finances() {
                             <tbody>
                                 {ventasDelMesFiltradas.map((venta) => (
                                     <tr key={venta.id}>
-                                        <td>{venta.fecha}</td>
+                                        <td>{venta.fecha instanceof Timestamp ? venta.fecha.toDate().toISOString().split('T')[0] : venta.fecha}</td>
                                         <td>{venta.nombre}</td>
                                         <td>{venta.categoria || 'N/A'}</td>
                                         <td>${parseFloat(venta.costo || 0).toFixed(2)}</td>
