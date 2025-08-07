@@ -6,7 +6,9 @@ import { db } from '../firebase/config';
 
 function Finances() {
     const [allTurnos, setAllTurnos] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [allProductSales, setAllProductSales] = useState([]);
+    const [loadingTurnos, setLoadingTurnos] = useState(true);
+    const [loadingProducts, setLoadingProducts] = useState(true);
     const [error, setError] = useState(null);
 
     const today = new Date();
@@ -16,16 +18,37 @@ function Finances() {
     useEffect(() => {
         const q = query(collection(db, "turnos"), orderBy("fecha", "asc"));
 
-        const unsubscribe = onSnapshot(q,
+        const unsubscribe = onSnapshot(
+            q,
             (snapshot) => {
                 const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
                 setAllTurnos(data);
-                setLoading(false);
+                setLoadingTurnos(false);
             },
             (err) => {
                 console.error("Error al obtener turnos para finanzas:", err);
                 setError("Error al cargar los datos de finanzas.");
-                setLoading(false);
+                setLoadingTurnos(false);
+            }
+        );
+
+        return () => unsubscribe();
+    }, []);
+
+    useEffect(() => {
+        const q = query(collection(db, 'productSales'), orderBy('fecha', 'asc'));
+
+        const unsubscribe = onSnapshot(
+            q,
+            (snapshot) => {
+                const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+                setAllProductSales(data);
+                setLoadingProducts(false);
+            },
+            (err) => {
+                console.error('Error al obtener ventas de productos:', err);
+                setError('Error al cargar los datos de finanzas.');
+                setLoadingProducts(false);
             }
         );
 
@@ -34,16 +57,16 @@ function Finances() {
 
     // Cálculo de las ganancias y filtrado de turnos para el mes y año seleccionados
     // ¡Aquí añadimos el contador de cortes!
-    const { monthlyEarnings, totalCortes, turnosDelMesFiltrados } = useMemo(() => {
+    const { gananciaTurnos, totalCortes, turnosDelMesFiltrados } = useMemo(() => {
         let total = 0;
         let cortesCount = 0; // NUEVO: Contador de cortes
 
-        const turnosFiltrados = allTurnos.filter(turno => {
+        const turnosFiltrados = allTurnos.filter((turno) => {
             const [year, month] = turno.fecha.split('-').map(Number);
             return year === selectedYear && month === selectedMonth;
         });
 
-        turnosFiltrados.forEach(turno => {
+        turnosFiltrados.forEach((turno) => {
             total += parseFloat(turno.precio || 0);
 
             // NUEVO: Contamos solo si el servicio es un tipo de corte
@@ -52,12 +75,42 @@ function Finances() {
             }
         });
 
-        return { 
-            monthlyEarnings: total, 
+        return {
+            gananciaTurnos: total,
             totalCortes: cortesCount, // Retornamos el nuevo contador
-            turnosDelMesFiltrados: turnosFiltrados 
+            turnosDelMesFiltrados: turnosFiltrados,
         };
     }, [allTurnos, selectedMonth, selectedYear]);
+
+    // Cálculo de las ganancias de productos para el mes y año seleccionados
+    const {
+        ingresosProductos: _ingresosProductos,
+        costosProductos: _costosProductos,
+        gananciaProductos,
+        ventasDelMesFiltradas,
+    } = useMemo(() => {
+        let ingresos = 0;
+        let costos = 0;
+
+        const ventasFiltradas = allProductSales.filter((venta) => {
+            const [year, month] = venta.fecha.split('-').map(Number);
+            return year === selectedYear && month === selectedMonth;
+        });
+
+        ventasFiltradas.forEach((venta) => {
+            ingresos += parseFloat(venta.precioVenta || 0);
+            costos += parseFloat(venta.costo || 0);
+        });
+
+        return {
+            ingresosProductos: ingresos,
+            costosProductos: costos,
+            gananciaProductos: ingresos - costos,
+            ventasDelMesFiltradas: ventasFiltradas,
+        };
+    }, [allProductSales, selectedMonth, selectedYear]);
+
+    const gananciaTotal = gananciaTurnos + gananciaProductos;
 
     // Opciones de años para el selector
     const years = useMemo(() => {
@@ -77,7 +130,13 @@ function Finances() {
         { value: 10, name: 'Octubre' }, { value: 11, name: 'Noviembre' }, { value: 12, name: 'Diciembre' }
     ];
 
-    if (loading) return <div className="text-center mt-5"><div className="spinner-border text-primary"></div></div>;
+    if (loadingTurnos || loadingProducts) {
+        return (
+            <div className="text-center mt-5">
+                <div className="spinner-border text-primary"></div>
+            </div>
+        );
+    }
     if (error) return <div className="alert alert-danger text-center mt-5">{error}</div>;
 
     return (
@@ -112,7 +171,13 @@ function Finances() {
                 </div>
 
                 <h3 className="text-center mt-4 mb-3">
-                    Ganancias Totales del Mes: <span className="text-primary fs-4">${monthlyEarnings.toFixed(2)}</span>
+                    Ganancia de Turnos: <span className="text-primary fs-4">${gananciaTurnos.toFixed(2)}</span>
+                </h3>
+                <h3 className="text-center mb-3">
+                    Ganancia de Productos: <span className="text-success fs-4">${gananciaProductos.toFixed(2)}</span>
+                </h3>
+                <h3 className="text-center mb-3">
+                    Ganancia Total Combinada: <span className="text-warning fs-4">${gananciaTotal.toFixed(2)}</span>
                 </h3>
 
                 {/* NUEVO: Contador de Cortes */}
@@ -122,7 +187,7 @@ function Finances() {
                 {/* FIN NUEVO */}
 
                 <p className="text-center text-white-50">
-                    Calculado a partir de los turnos con precio en el mes seleccionado.
+                    Calculado a partir de los turnos con precio y las ventas de productos en el mes seleccionado.
                 </p>
                 
                 {turnosDelMesFiltrados.length > 0 && (
@@ -139,7 +204,7 @@ function Finances() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {turnosDelMesFiltrados.map(turno => (
+                                {turnosDelMesFiltrados.map((turno) => (
                                     <tr key={turno.id}>
                                         <td>{turno.fecha}</td>
                                         <td>{turno.hora}</td>
@@ -152,8 +217,39 @@ function Finances() {
                         </table>
                     </div>
                 )}
-                 {turnosDelMesFiltrados.length === 0 && (
+                {turnosDelMesFiltrados.length === 0 && (
                     <p className="text-white-50 text-center mt-3">No hay turnos con precio para este mes.</p>
+                )}
+
+                {ventasDelMesFiltradas.length > 0 && (
+                    <div className="mt-4 table-responsive">
+                        <h4 className="text-white-50 mb-3">Detalle de Ventas de Productos del Mes:</h4>
+                        <table className="table table-dark table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Nombre</th>
+                                    <th>Costo</th>
+                                    <th>Precio</th>
+                                    <th>Ganancia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {ventasDelMesFiltradas.map((venta) => (
+                                    <tr key={venta.id}>
+                                        <td>{venta.fecha}</td>
+                                        <td>{venta.nombre}</td>
+                                        <td>${parseFloat(venta.costo || 0).toFixed(2)}</td>
+                                        <td>${parseFloat(venta.precioVenta || 0).toFixed(2)}</td>
+                                        <td>${(parseFloat(venta.precioVenta || 0) - parseFloat(venta.costo || 0)).toFixed(2)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                {ventasDelMesFiltradas.length === 0 && (
+                    <p className="text-white-50 text-center mt-3">No hay ventas de productos para este mes.</p>
                 )}
 
             </div>
