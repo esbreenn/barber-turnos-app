@@ -44,7 +44,7 @@ function AddProducto() {
         ...producto,
         costo: Number(producto.costo),
         precioVenta: Number(producto.precioVenta),
-        categoria: producto.categoria.trim() || null,
+        categoria: producto.categoria || null,
         creado: Timestamp.now(),
       });
       toast.success('Venta registrada con éxito');
