@@ -20,17 +20,17 @@ function Navbar({ currentUser }) {
   return (
     <nav className="app-navbar">
       <div className="nav-buttons">
-        <Link to="/" className="btn btn-outline-light">
+        <Link to="/" className="btn btn-nav">
           Inicio
         </Link>
-        <Link to="/nuevo" className="btn btn-primary">
+        <Link to="/nuevo" className="btn btn-nav">
           Agregar Turno
         </Link>
         {/* ¡NUEVO ENLACE para Finanzas! */}
-        <Link to="/finanzas" className="btn btn-outline-success"> {/* Puedes elegir otro color de botón */}
+        <Link to="/finanzas" className="btn btn-nav">
           Finanzas
         </Link>
-        <Link to="/venta-producto" className="btn btn-outline-warning">
+        <Link to="/venta-producto" className="btn btn-nav">
           Venta de Producto
         </Link>
       </div>
@@ -39,7 +39,7 @@ function Navbar({ currentUser }) {
         <span className="welcome-text">
           Bienvenido {currentUser && currentUser.email ? currentUser.email.split('@')[0] : 'Usuario'}
         </span>
-        <button onClick={handleLogout} className="btn btn-outline-danger">
+        <button onClick={handleLogout} className="btn btn-nav">
           Cerrar Sesión
         </button>
       </div>
