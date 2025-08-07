@@ -14,6 +14,12 @@ function Finances() {
     const today = new Date();
     const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(today.getFullYear());
+    const [selectedCategory, setSelectedCategory] = useState('');
+
+    const productCategories = useMemo(() => {
+        const categories = allProductSales.map((venta) => venta.categoria).filter(Boolean);
+        return Array.from(new Set(categories));
+    }, [allProductSales]);
 
     useEffect(() => {
         const q = query(collection(db, "turnos"), orderBy("fecha", "asc"));
@@ -94,7 +100,9 @@ function Finances() {
 
         const ventasFiltradas = allProductSales.filter((venta) => {
             const [year, month] = venta.fecha.split('-').map(Number);
-            return year === selectedYear && month === selectedMonth;
+            const matchesDate = year === selectedYear && month === selectedMonth;
+            const matchesCategory = selectedCategory ? venta.categoria === selectedCategory : true;
+            return matchesDate && matchesCategory;
         });
 
         ventasFiltradas.forEach((venta) => {
@@ -108,7 +116,7 @@ function Finances() {
             gananciaProductos: ingresos - costos,
             ventasDelMesFiltradas: ventasFiltradas,
         };
-    }, [allProductSales, selectedMonth, selectedYear]);
+    }, [allProductSales, selectedMonth, selectedYear, selectedCategory]);
 
     const gananciaTotal = gananciaTurnos + gananciaProductos;
 
@@ -160,12 +168,25 @@ function Finances() {
                     <label htmlFor="year-select" className="form-label me-2 mb-0">Año:</label>
                     <select
                         id="year-select"
-                        className="form-select w-auto bg-secondary text-white border-0"
+                        className="form-select w-auto me-3 bg-secondary text-white border-0"
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(Number(e.target.value))}
                     >
                         {years.map(year => (
                             <option key={year} value={year}>{year}</option>
+                        ))}
+                    </select>
+
+                    <label htmlFor="category-select" className="form-label me-2 mb-0">Categoría:</label>
+                    <select
+                        id="category-select"
+                        className="form-select w-auto bg-secondary text-white border-0"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                        <option value="">Todas</option>
+                        {productCategories.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
                         ))}
                     </select>
                 </div>
@@ -229,6 +250,7 @@ function Finances() {
                                 <tr>
                                     <th>Fecha</th>
                                     <th>Nombre</th>
+                                    <th>Categoría</th>
                                     <th>Costo</th>
                                     <th>Precio</th>
                                     <th>Ganancia</th>
@@ -239,6 +261,7 @@ function Finances() {
                                     <tr key={venta.id}>
                                         <td>{venta.fecha}</td>
                                         <td>{venta.nombre}</td>
+                                        <td>{venta.categoria || 'N/A'}</td>
                                         <td>${parseFloat(venta.costo || 0).toFixed(2)}</td>
                                         <td>${parseFloat(venta.precioVenta || 0).toFixed(2)}</td>
                                         <td>${(parseFloat(venta.precioVenta || 0) - parseFloat(venta.costo || 0)).toFixed(2)}</td>

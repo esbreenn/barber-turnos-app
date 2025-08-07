@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+const CATEGORIES = ['Cabello', 'Barba', 'Cuidado Personal', 'Accesorios', 'Otros'];
+
 function ProductoForm({ productoData, onFormChange, onSubmit, isSaving, submitText }) {
   const { nombre, costo, precioVenta, fecha, categoria } = productoData;
 
@@ -65,15 +67,21 @@ function ProductoForm({ productoData, onFormChange, onSubmit, isSaving, submitTe
         </div>
 
         <div className="mb-3">
-          <label htmlFor="categoria" className="form-label">Categoría (opcional)</label>
-          <input
-            type="text"
-            className="form-control"
+          <label htmlFor="categoria" className="form-label">Categoría</label>
+          <select
             id="categoria"
             name="categoria"
+            className="form-select"
             value={categoria}
             onChange={onFormChange}
-          />
+          >
+            <option value="">Sin categoría</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
         </div>
 
         <button type="submit" className="btn btn-primary w-100" disabled={isSaving}>
