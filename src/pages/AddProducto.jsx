@@ -41,9 +41,10 @@ function AddProducto() {
 
     try {
       await addDoc(collection(db, 'productSales'), {
-        ...producto,
+        nombre: producto.nombre,
         costo: Number(producto.costo),
         precioVenta: Number(producto.precioVenta),
+        fecha: Timestamp.fromDate(new Date(producto.fecha)),
         categoria: producto.categoria || null,
         creado: Timestamp.now(),
       });
