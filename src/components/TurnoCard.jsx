@@ -14,10 +14,20 @@ function TurnoCard({ turno, onDelete, onEdit }) {
         {nombre}
       </div>
       <div className="col-acciones">
-        <button onClick={() => onEdit(id)} className="btn btn-sm btn-outline-info">
+        <button
+          type="button"
+          aria-label="Editar turno"
+          onClick={() => onEdit(id)}
+          className="btn btn-sm btn-outline-info"
+        >
           <FaEdit />
         </button>
-        <button onClick={() => onDelete(id)} className="btn btn-sm btn-outline-danger">
+        <button
+          type="button"
+          aria-label="Eliminar turno"
+          onClick={() => onDelete(id)}
+          className="btn btn-sm btn-outline-danger"
+        >
           <FaTrashAlt />
         </button>
       </div>
