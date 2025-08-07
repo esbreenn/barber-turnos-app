@@ -30,6 +30,9 @@ function Navbar({ currentUser }) {
         <Link to="/finanzas" className="btn btn-outline-success"> {/* Puedes elegir otro color de botón */}
           Finanzas
         </Link>
+        <Link to="/venta-producto" className="btn btn-outline-warning">
+          Venta de Producto
+        </Link>
       </div>
       <div className="user-actions">
         {/* Aquí mostramos el email del usuario logueado */}
