@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { db } from '../firebase/config';
+import { db, auth } from '../firebase/config';
 
 function Finances() {
     const [allTurnos, setAllTurnos] = useState([]);
@@ -22,6 +22,12 @@ function Finances() {
     }, [allProductSales]);
 
     useEffect(() => {
+        if (!auth.currentUser) {
+            setError('Debes iniciar sesión para ver los datos de finanzas.');
+            setLoadingTurnos(false);
+            return;
+        }
+
         const q = query(collection(db, "turnos"), orderBy("fecha", "asc"));
 
         const unsubscribe = onSnapshot(
@@ -33,7 +39,7 @@ function Finances() {
             },
             (err) => {
                 console.error("Error al obtener turnos para finanzas:", err);
-                setError("Error al cargar los datos de finanzas.");
+                setError(err.code === 'permission-denied' ? 'No tienes permisos para ver los datos.' : 'Error al cargar los datos de finanzas.');
                 setLoadingTurnos(false);
             }
         );
@@ -42,6 +48,12 @@ function Finances() {
     }, []);
 
     useEffect(() => {
+        if (!auth.currentUser) {
+            setError('Debes iniciar sesión para ver los datos de finanzas.');
+            setLoadingProducts(false);
+            return;
+        }
+
         const q = query(collection(db, 'productSales'), orderBy('fecha', 'asc'));
 
         const unsubscribe = onSnapshot(
@@ -53,7 +65,7 @@ function Finances() {
             },
             (err) => {
                 console.error('Error al obtener ventas de productos:', err);
-                setError('Error al cargar los datos de finanzas.');
+                setError(err.code === 'permission-denied' ? 'No tienes permisos para ver los datos.' : 'Error al cargar los datos de finanzas.');
                 setLoadingProducts(false);
             }
         );
