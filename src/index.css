@@ -9,6 +9,7 @@
   --color-info: #17a2b8;
   --color-danger: #dc3545;
   --color-success: #28a745; /* Añadimos color para el botón de Finanzas */
+  --color-warning: #ffc107;
   --color-text-primary: #f8f9fa;
   --color-text-secondary: #bbb;
   --color-border: #444;
@@ -70,6 +71,8 @@ body {
 .btn-outline-info:hover { color: #fff; background-color: var(--color-info); border-color: var(--color-info); }
 .btn-outline-success { color: var(--color-success); border-color: var(--color-success); } /* NUEVO: Botón de éxito */
 .btn-outline-success:hover { color: #fff; background-color: var(--color-success); border-color: var(--color-success); } /* NUEVO: Botón de éxito hover */
+.btn-outline-warning { color: var(--color-warning); border-color: var(--color-warning); }
+.btn-outline-warning:hover { color: #212529; background-color: var(--color-warning); border-color: var(--color-warning); }
 .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem; border-radius: 0.2rem; }
 
 /* 4. Barra de Navegación (Navbar) */
