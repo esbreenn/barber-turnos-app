@@ -75,6 +75,19 @@ body {
 .btn-outline-warning:hover { color: #212529; background-color: var(--color-warning); border-color: var(--color-warning); }
 .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem; border-radius: 0.2rem; }
 
+/* Botones de navegación unificados */
+.btn-nav {
+  color: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  background-color: transparent;
+}
+
+.btn-nav:hover {
+  color: var(--color-background);
+  background-color: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+}
+
 /* 4. Barra de Navegación (Navbar) */
 .app-navbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 25px; }
 .app-navbar .nav-buttons, .app-navbar .user-actions { display: flex; align-items: center; gap: 10px; }
