@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { collection, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase/config';
+import { formatCurrency } from '../utils/formatCurrency';
 
 function parseYearMonth(fecha) {
     if (typeof fecha === 'string') {
@@ -215,13 +216,13 @@ function Finances() {
                 </div>
 
                 <h3 className="text-center mt-4 mb-3">
-                    Ganancia de Turnos: <span className="text-primary fs-4">${gananciaTurnos.toFixed(2)}</span>
+                    Ganancia de Turnos: <span className="text-primary fs-4">{formatCurrency(gananciaTurnos)}</span>
                 </h3>
                 <h3 className="text-center mb-3">
-                    Ganancia de Productos: <span className="text-success fs-4">${gananciaProductos.toFixed(2)}</span>
+                    Ganancia de Productos: <span className="text-success fs-4">{formatCurrency(gananciaProductos)}</span>
                 </h3>
                 <h3 className="text-center mb-3">
-                    Ganancia Total Combinada: <span className="text-warning fs-4">${gananciaTotal.toFixed(2)}</span>
+                    Ganancia Total Combinada: <span className="text-warning fs-4">{formatCurrency(gananciaTotal)}</span>
                 </h3>
 
                 {/* NUEVO: Contador de Cortes */}
@@ -254,7 +255,7 @@ function Finances() {
                                         <td>{turno.hora}</td>
                                         <td>{turno.nombre}</td>
                                         <td>{turno.servicio || 'N/A'}</td>
-                                        <td>${parseFloat(turno.precio || 0).toFixed(2)}</td>
+                                        <td>{formatCurrency(turno.precio || 0)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -285,9 +286,9 @@ function Finances() {
                                         <td>{venta.fecha instanceof Timestamp ? venta.fecha.toDate().toISOString().split('T')[0] : venta.fecha}</td>
                                         <td>{venta.nombre}</td>
                                         <td>{venta.categoria || 'N/A'}</td>
-                                        <td>${parseFloat(venta.costo || 0).toFixed(2)}</td>
-                                        <td>${parseFloat(venta.precioVenta || 0).toFixed(2)}</td>
-                                        <td>${(parseFloat(venta.precioVenta || 0) - parseFloat(venta.costo || 0)).toFixed(2)}</td>
+                                        <td>{formatCurrency(venta.costo || 0)}</td>
+                                        <td>{formatCurrency(venta.precioVenta || 0)}</td>
+                                        <td>{formatCurrency((venta.precioVenta || 0) - (venta.costo || 0))}</td>
                                     </tr>
                                 ))}
                             </tbody>
