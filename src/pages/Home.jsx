@@ -6,7 +6,8 @@ import { db, auth } from "../firebase/config";
 import { useNavigate } from "react-router-dom";
 import CalendarView from "../components/CalendarView";
 import TurnoList from "../components/TurnoList";
-import toast from 'react-hot-toast'; 
+import toast from 'react-hot-toast';
+import { formatCurrency } from "../utils/formatCurrency";
 
 function Home() {
   const [allTurnos, setAllTurnos] = useState([]);
@@ -44,6 +45,12 @@ function Home() {
     const dateString = selectedDate.toISOString().split('T')[0];
     return allTurnos.filter(turno => turno.fecha === dateString);
   }, [selectedDate, allTurnos]);
+
+  const cortesCompletados = useMemo(() => filteredTurnos.filter(t => t.completado), [filteredTurnos]);
+  const gananciaDiaria = useMemo(
+    () => cortesCompletados.reduce((s, t) => s + (parseFloat(t.precio) || 0), 0),
+    [cortesCompletados]
+  );
 
   // NUEVO: Lógica para identificar turnos próximos (para el día de hoy)
   const todayTurnos = useMemo(() => {
@@ -121,7 +128,7 @@ function Home() {
 
       <h2 className="mb-3 text-white">Tu Agenda</h2>
       <div className="text-white mb-3">
-        Total de cortes: {filteredTurnos.length}
+        Cortes completados: {cortesCompletados.length} — Ganancia: {formatCurrency(gananciaDiaria)}
       </div>
       <CalendarView
         onDateChange={handleDateChange}
