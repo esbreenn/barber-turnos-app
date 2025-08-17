@@ -178,10 +178,24 @@ body {
     flex-direction: column;
     align-items: center;
   }
-  .app-navbar .nav-buttons, 
+  .app-navbar .nav-buttons,
   .app-navbar .user-actions {
     justify-content: center;
     width: 100%;
+  }
+  .app-navbar .nav-buttons {
+    flex-wrap: wrap;
+  }
+  .app-navbar .nav-buttons .btn-nav {
+    flex: 1 1 calc(50% - 10px);
+  }
+  .app-navbar .user-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .app-navbar .user-actions .welcome-text {
+    margin-right: 0;
   }
   /* Ajuste para los selectores de Finanzas en móvil */
   .card.bg-dark .d-flex.flex-wrap {
