@@ -45,11 +45,6 @@ function Home() {
     return allTurnos.filter(turno => turno.fecha === dateString);
   }, [selectedDate, allTurnos]);
 
-  const completedCount = useMemo(
-    () => filteredTurnos.filter(t => t.completado).length,
-    [filteredTurnos]
-  );
-
   // NUEVO: Lógica para identificar turnos próximos (para el día de hoy)
   const todayTurnos = useMemo(() => {
     // Obtener la fecha actual en formato 'YYYY-MM-DD'
@@ -126,7 +121,7 @@ function Home() {
 
       <h2 className="mb-3 text-white">Tu Agenda</h2>
       <div className="text-white mb-3">
-        Cortes completados: {completedCount} / {filteredTurnos.length}
+        Total de cortes: {filteredTurnos.length}
       </div>
       <CalendarView
         onDateChange={handleDateChange}

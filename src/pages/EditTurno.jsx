@@ -24,8 +24,9 @@ function EditTurno() {
           const data = turnoDoc.data();
           setTurno({
             id: turnoDoc.id,
-            ...data,
-            completado: data.completado ?? false,
+            nombre: data.nombre || '',
+            fecha: data.fecha || '',
+            hora: data.hora || '',
             servicio: data.servicio || '',
             precio: data.precio !== undefined ? String(data.precio) : '0',
           });

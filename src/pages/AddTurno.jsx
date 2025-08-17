@@ -14,8 +14,7 @@ const initialState = {
   fecha: '',
   hora: '',
   servicio: '', // Servicio inicial vacío para obligar a la selección
-  precio: 0, // Precio inicial 0, se actualizará al seleccionar un servicio
-  completado: false // Estado inicial del turno
+  precio: 0 // Precio inicial 0, se actualizará al seleccionar un servicio
 };
 
 function AddTurno() {
@@ -72,10 +71,10 @@ function AddTurno() {
       // Aseguramos que se guarde como número.
       const precioNumerico = parseFloat(turno.precio); 
 
-      // Guardamos el turno con el precio (ya calculado) y marcado como pendiente
+      // Guardamos el turno con el precio (ya calculado)
       await addDoc(
         collection(db, "turnos"),
-        { ...turno, precio: precioNumerico, completado: false, creado: Timestamp.now() }
+        { ...turno, precio: precioNumerico, creado: Timestamp.now() }
       );
       toast.success('Turno guardado con éxito');
       navigate('/');
