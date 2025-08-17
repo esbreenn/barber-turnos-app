@@ -4,16 +4,16 @@ import { useMemo } from 'react';
 function useServices() {
   const services = useMemo(
     () => [
-      { id: 'corte', nombre: 'Corte de pelo' },
-      { id: 'corte-barba', nombre: 'Corte de pelo y barba' },
+      { id: 'corte', nombre: 'Corte de Cabello' },
+      { id: 'corte-barba', nombre: 'Corte de Cabello y Barba' },
     ],
     []
   );
 
   const servicePrices = useMemo(
     () => ({
-      'Corte de pelo': 9000,
-      'Corte de pelo y barba': 12000,
+      'Corte de Cabello': 9000,
+      'Corte de Cabello y Barba': 12000,
     }),
     []
   );

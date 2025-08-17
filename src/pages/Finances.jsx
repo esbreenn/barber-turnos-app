@@ -100,7 +100,7 @@ function Finances() {
             total += parseFloat(turno.precio || 0);
 
             // NUEVO: Contamos solo si el servicio es un tipo de corte
-            if (turno.servicio === 'Corte de Cabello' || turno.servicio === 'Corte y Barba') {
+            if (turno.servicio === 'Corte de Cabello' || turno.servicio === 'Corte de Cabello y Barba') {
                 cortesCount++;
             }
         });
