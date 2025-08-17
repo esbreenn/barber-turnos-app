@@ -2,9 +2,22 @@
 
 import React from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase/config';
+import toast from 'react-hot-toast';
 
 function TurnoCard({ turno, onDelete, onEdit }) {
-  const { id, nombre, hora, servicio } = turno; // Mantenemos servicio aquí por si lo usamos en el 'title'
+  const { id, nombre, hora, servicio, completado } = turno; // Mantenemos servicio aquí por si lo usamos en el 'title'
+
+  const handleCompletado = async () => {
+    try {
+      await updateDoc(doc(db, 'turnos', id), { completado: true });
+      toast.success('Turno completado');
+    } catch (err) {
+      console.error('Error al marcar como completado:', err);
+      toast.error('No se pudo marcar como completado');
+    }
+  };
 
   return (
     <div className="turno-row">
@@ -29,6 +42,15 @@ function TurnoCard({ turno, onDelete, onEdit }) {
           className="btn btn-sm btn-outline-danger"
         >
           <FaTrashAlt />
+        </button>
+        <button
+          type="button"
+          aria-label="Marcar como completado"
+          onClick={handleCompletado}
+          className="btn btn-sm btn-outline-success"
+          disabled={completado}
+        >
+          Completado
         </button>
       </div>
     </div>
