@@ -25,6 +25,7 @@ function EditTurno() {
           setTurno({
             id: turnoDoc.id,
             ...data,
+            completado: data.completado ?? false,
             servicio: data.servicio || '',
             precio: data.precio !== undefined ? String(data.precio) : '0',
           });
