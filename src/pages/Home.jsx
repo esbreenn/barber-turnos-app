@@ -46,7 +46,10 @@ function Home() {
     return allTurnos.filter(turno => turno.fecha === dateString);
   }, [selectedDate, allTurnos]);
 
-  const cortesCompletados = useMemo(() => filteredTurnos.filter(t => t.completado), [filteredTurnos]);
+  const cortesCompletados = useMemo(() => {
+    const completados = filteredTurnos.filter(t => t.completado);
+    return completados.length ? completados : filteredTurnos;
+  }, [filteredTurnos]);
   const gananciaDiaria = useMemo(
     () => cortesCompletados.reduce((s, t) => s + (parseFloat(t.precio) || 0), 0),
     [cortesCompletados]
