@@ -2,7 +2,15 @@
 
 import React from 'react';
 
-const CATEGORIES = ['Cabello', 'Barba', 'Cuidado Personal', 'Accesorios', 'Otros'];
+const CATEGORIES = [
+  'Cera',
+  'Polvo texturizante',
+  'Pantalon/Joggin',
+  'Conjunto',
+  'Short',
+  'Perfume',
+  'Campera',
+];
 
 function ProductoForm({ productoData, onFormChange, onSubmit, isSaving, submitText }) {
   const { nombre, costo, precioVenta, fecha, categoria } = productoData;
