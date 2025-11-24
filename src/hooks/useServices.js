@@ -12,8 +12,8 @@ function useServices() {
 
   const servicePrices = useMemo(
     () => ({
-      'Corte de Cabello': 9000,
-      'Corte de Cabello y Barba': 12000,
+      'Corte de Cabello': 10000,
+      'Corte de Cabello y Barba': 13000,
     }),
     []
   );
